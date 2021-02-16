@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+require_relative File.join(__dir__, '..', 'lib', 'gouteur')
+
+success = Gouteur::CLI.call
+exit(success ? 0 : 1)
