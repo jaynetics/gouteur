@@ -3,7 +3,7 @@
 [![Gem Version](https://badge.fury.io/rb/gouteur.svg)](http://badge.fury.io/rb/gouteur)
 [![Build Status](https://github.com/jaynetics/gouteur/workflows/build/badge.svg)](https://github.com/jaynetics/gouteur/actions)
 
-Treat the people that use your gem like royalty! Before serving them your latest changes, send for a goûteur ([food taster](https://en.wikipedia.org/wiki/Food_taster))!
+Treat the people that use your gem like royalty! Send for a [gouteur](https://en.wikipedia.org/wiki/Food_taster) before serving them something new!
 
 ## What?
 

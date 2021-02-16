@@ -38,10 +38,8 @@ RSpec.describe Gouteur::CLI do
     end
 
     it 'falls back to repos defined in the dotfile' do
-      result = Gouteur::CLI.pick_repos([])
-      expect(result.count).to eq 1
-      expect(result.first).to be_a Gouteur::Repo
-      expect(result.first.uri.to_s).to eq 'example_uri_in_dotfile'
+      expect(Gouteur::Dotfile).to receive(:repos).and_return(:repos_stub)
+      expect(Gouteur::CLI.pick_repos([])).to eq :repos_stub
     end
   end
 end

@@ -72,7 +72,10 @@ RSpec.describe Gouteur::Checker do
       adapted_gemfile = "#{__dir__}/example_repo/Gemfile.gouteur"
 
       # this is very slow, but at the heart of the gem, so should be tested
-      File.open(adapted_gemfile, 'w') { |f| f.puts "gem 'sexy_slug'" }
+      File.open(adapted_gemfile, 'w') do |file|
+        file.puts "source 'https://rubygems.org'"
+        file.puts "gem 'sexy_slug'"
+      end
       expect(checker.install_adapted_bundle).to eq true
       expect(File.read("#{adapted_gemfile}.lock")).to include 'sexy_slug'
     end

@@ -3,13 +3,17 @@ module Gouteur
   module Dotfile
     module_function
 
+    def present?
+      File.exist?(path)
+    end
+
     def path
       File.join(Host.root, '.gouteur.yml')
     end
 
     def content
       @content ||=
-        File.exist?(path) ? YAML.load_file(path, symbolize_names: true) : {}
+        present? ? YAML.safe_load(File.read(path), symbolize_names: true) : {}
     end
 
     def repos
