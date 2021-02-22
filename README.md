@@ -17,7 +17,7 @@ When you release a new version of your gem, these projects might break.
 
 [Semantic versioning](https://semver.org) obviously helps. People make mistakes, though. The boundary between public and private APIs can also be fuzzy, particularly in an open language like Ruby.
 
-Thus, when you update your gem, you might feel as if you should check whether things that depend on it will keep working.
+Thus, when you update your gem, you might feel as if you should check whether things that depend on it will keep working before you release the new version.
 
 Gouteur automates this step.
 
