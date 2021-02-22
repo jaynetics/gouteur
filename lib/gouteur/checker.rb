@@ -30,7 +30,7 @@ module Gouteur
 
       [true, Message.success(repo: repo)]
     rescue Gouteur::Error => e
-      [false, e.message]
+      [false, e.message.chomp]
     end
 
     def prepare
@@ -55,7 +55,7 @@ module Gouteur
       result = repo.bundle.exec(task, env: adapted ? adaptation_env : {})
       result.success? or raise Error, Message.send(
         adapted ? :broken_after_update : :broken,
-        repo: repo, task: task, error: result.stderr
+        repo: repo, task: task, output: result.stdout, error: result.stderr
       )
     end
 
@@ -100,8 +100,9 @@ module Gouteur
       elsif result.exitstatus == BUNDLER_INCOMPATIBLE_VERSION_CODE ||
             result.exitstatus == BUNDLER_GEM_NOT_FOUND_CODE &&
             result.stderr =~ /following version/
-        if repo.locked? # rubocop:disable Style/GuardClause
-          raise Error, Message.incompatible_failure(error: result.full_error)
+        if repo.locked?
+          raise Error,
+                Message.incompatible_failure(repo: repo, error: result.stderr)
         else
           false
         end

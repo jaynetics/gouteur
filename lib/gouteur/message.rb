@@ -8,10 +8,7 @@ module Gouteur
         👨‍🍳 Oh non!
 
         The command `$ #{args.join(' ')}` failed in `#{pwd}`.
-
-        The original error was:
-
-        #{stderr.chomp}
+        #{original_error_part(stderr)}
       MSG
     end
 
@@ -54,24 +51,19 @@ module Gouteur
         Task `#{task}` failed for `#{repo}` even before inserting the new code of `#{Host.name}`.
 
         This likely means the task is broken or does not exist.
-
-        The original error was:
-
-        #{error}
+        #{original_error_part(error)}
       MSG
     end
 
-    def broken_after_update(repo:, task:, error:)
+    def broken_after_update(repo:, task:, output:, error:)
       <<~MSG
         👨‍🍳 Répugnant!
 
         Task `#{task}` failed for `#{repo}` after inserting the new code of `#{Host.name}`.
 
         This likely means you ruined it! (Or the task is not idempotent. Or this is a bug in gouteur.)
-
-        The original error was:
-
-        #{error}
+        #{original_output_part(output)}
+        #{original_error_part(error)}
       MSG
     end
 
@@ -85,12 +77,29 @@ module Gouteur
       MSG
     end
 
-    def incompatible_failure(error:)
+    def incompatible_failure(repo:, error:)
       <<~MSG
-        #{error}
+        👨‍🍳 Zut alors!
+
+        The new version number of `#{Host.name}` is incompatible with the version requirements specified by `#{repo}`.
 
         Incompatible version numbers can be allowed by removing the `locked` flag. This will make gouteur SKIP the tasks in this case.
+        #{original_error_part(error)}
       MSG
+    end
+
+    def original_error_part(stderr)
+      msg = strip(stderr)
+      msg.empty? ? '' : "\n👇 The original error was:\n\n#{msg}"
+    end
+
+    def original_output_part(stdout)
+      msg = strip(stdout)
+      msg.empty? ? '' : "\n👇 The original output was:\n\n#{msg}"
+    end
+
+    def strip(string)
+      string.to_s.gsub(/\A\s+|\s+\z/, '')
     end
   end
 end
