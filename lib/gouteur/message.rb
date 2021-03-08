@@ -14,7 +14,7 @@ module Gouteur
 
     def success(repo:)
       <<~MSG
-        👨‍🍳 Délicieux!
+        👨‍🍳 #{random_word_for_tasty.capitalize}!
 
         Your changes to `#{Host.name}` are fine for `#{repo}`. All tasks succeeded.
       MSG
@@ -57,7 +57,7 @@ module Gouteur
 
     def broken_after_update(repo:, task:, output:, error:)
       <<~MSG
-        👨‍🍳 Répugnant!
+        👨‍🍳 #{random_word_for_disgusting.capitalize}!
 
         Task `#{task}` failed for `#{repo}` after inserting the new code of `#{Host.name}`.
 
@@ -99,6 +99,14 @@ module Gouteur
 
     def strip(string)
       string.to_s.gsub(/\A\s+|\s+\z/, '')
+    end
+
+    def random_word_for_tasty
+      %w[délectable délicieux savoureux succulent].sample
+    end
+
+    def random_word_for_disgusting
+      %w[dégoûtant immangeable répugnant].sample
     end
   end
 end
