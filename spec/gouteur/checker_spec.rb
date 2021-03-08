@@ -89,13 +89,12 @@ RSpec.describe Gouteur::Checker do
       expect(checker.install_adapted_bundle).to eq false
     end
 
-    it 'can raise if the current gem version is incompatible' do
+    it 'can raise if the installation fails for other reasons' do
       stub_repo_preparation!
       adapted_gemfile = "#{__dir__}/example_repo/Gemfile.gouteur"
       File.open(adapted_gemfile, 'w') do |f|
-        f.puts "gem 'gouteur', '1337', path: '../../../'"
+        f.puts 'nonsense'
       end
-      expect(repo).to receive(:locked?).and_return(true)
       expect { checker.install_adapted_bundle }.to raise_error(Gouteur::Error)
     end
   end
@@ -159,6 +158,19 @@ RSpec.describe Gouteur::Checker do
 
       expect { checker.run_task('rspec', adapted: true) }
         .to raise_error(Gouteur::Error, /i_dont_exist/)
+    end
+  end
+
+  describe '#handle_incompatible_semver' do
+    it 'treats incompatible versions as success by default' do
+      result = checker.handle_incompatible_semver
+      expect(result[0]).to eq true
+      expect(result[1]).to match(/incompatible/)
+    end
+
+    it 'raises if the repo is #locked?' do
+      expect(repo).to receive(:locked?).and_return(true)
+      expect { checker.handle_incompatible_semver }.to raise_error(Gouteur::Error)
     end
   end
 end

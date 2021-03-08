@@ -22,9 +22,7 @@ module Gouteur
       run_tasks(adapted: false)
 
       create_adapted_gemfile
-      install_adapted_bundle or return [
-        true, Message.skipped_incompatible(repo: repo)
-      ]
+      install_adapted_bundle or return handle_incompatible_semver
 
       run_tasks(adapted: true)
 
@@ -52,7 +50,8 @@ module Gouteur
 
     def run_task(task, adapted: false)
       puts("Running `#{task}` with #{adapted ? :new : :old} `#{Host.name}`...")
-      result = repo.bundle.exec(task, env: adapted ? adaptation_env : {})
+      env = adapted ? adaptation_env : {}
+      result = repo.bundle.exec(task, env: env)
       result.success? or raise Error, Message.send(
         adapted ? :broken_after_update : :broken,
         repo: repo, task: task, output: result.stdout, error: result.stderr
@@ -89,26 +88,30 @@ module Gouteur
       "#{repo.bundle.gemfile_path}.gouteur"
     end
 
-    BUNDLER_INCOMPATIBLE_VERSION_CODE = 6
-    BUNDLER_GEM_NOT_FOUND_CODE        = 7 # includes some incompatibility cases
-
     def install_adapted_bundle
       result = repo.bundle.install(env: adaptation_env)
-
       if result.success?
         true
-      elsif result.exitstatus == BUNDLER_INCOMPATIBLE_VERSION_CODE ||
-            result.exitstatus == BUNDLER_GEM_NOT_FOUND_CODE &&
-            result.stderr =~ /following version/
-        if repo.locked?
-          raise Error,
-                Message.incompatible_failure(repo: repo, error: result.stderr)
-        else
-          false
-        end
+      elsif indicates_incompatible_semver?(result)
+        false
       else
         raise Error, result.full_error
       end
+    end
+
+    BUNDLER_INCOMPATIBLE_VERSION_CODE = 6
+    BUNDLER_GEM_NOT_FOUND_CODE = 7 # includes some incompatibility cases
+
+    def indicates_incompatible_semver?(result)
+      result.exitstatus == BUNDLER_INCOMPATIBLE_VERSION_CODE ||
+        result.exitstatus == BUNDLER_GEM_NOT_FOUND_CODE &&
+          result.stderr =~ /following version/
+    end
+
+    def handle_incompatible_semver
+      raise Error, Message.incompatible_failure(repo: repo) if repo.locked?
+
+      [true, Message.skipped_incompatible(repo: repo)]
     end
 
     def adaptation_env

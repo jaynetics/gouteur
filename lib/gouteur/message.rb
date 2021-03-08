@@ -77,14 +77,13 @@ module Gouteur
       MSG
     end
 
-    def incompatible_failure(repo:, error:)
+    def incompatible_failure(repo:)
       <<~MSG
         👨‍🍳 Zut alors!
 
         The new version number of `#{Host.name}` is incompatible with the version requirements specified by `#{repo}`.
 
         Incompatible version numbers can be allowed by removing the `locked` flag. This will make gouteur SKIP the tasks in this case.
-        #{original_error_part(error)}
       MSG
     end
 
