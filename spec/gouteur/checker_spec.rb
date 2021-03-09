@@ -133,6 +133,9 @@ RSpec.describe Gouteur::Checker do
       expect { checker.run_task('rspec spec/env_spec.rb') }
         .not_to raise_error
 
+      expect { checker.run_task('rspec inexistent_spec.rb') }
+        .to raise_error(Gouteur::Error, /`rspec inexistent_spec.rb` failed/)
+
       evil_env = { 'FAIL_SPEC_VIA_ENV' => '1' }
       expect(checker).to receive(:adaptation_env).and_return(evil_env)
       expect { checker.run_task('rspec spec/env_spec.rb', adapted: true) }

@@ -1,8 +1,10 @@
 ## [Unreleased]
 
-### Added
+## [1.0.1] - 2021-03-09
 
-- Slightly nicer output
+### Fixed
+
+- Fixed error when a task failed with the old code
 
 ## [1.0.0] - 2021-02-08
 

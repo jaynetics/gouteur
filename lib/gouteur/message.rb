@@ -44,13 +44,14 @@ module Gouteur
       MSG
     end
 
-    def broken(repo:, task:, error:)
+    def broken(repo:, task:, output:, error:)
       <<~MSG
         👨‍🍳 Zut alors!
 
         Task `#{task}` failed for `#{repo}` even before inserting the new code of `#{Host.name}`.
 
         This likely means the task is broken or does not exist.
+        #{original_output_part(output)}
         #{original_error_part(error)}
       MSG
     end
