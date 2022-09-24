@@ -13,4 +13,4 @@ gem 'relaxed-rubocop'
 
 gem 'example_repo', '0.1.0', path: './spec/gouteur/example_repo'
 
-gem 'byebug'
+gem 'debug'
