@@ -105,7 +105,7 @@ module Gouteur
     def indicates_incompatible_semver?(result)
       result.exitstatus == BUNDLER_INCOMPATIBLE_VERSION_CODE ||
         result.exitstatus == BUNDLER_GEM_NOT_FOUND_CODE &&
-          result.stderr =~ /following version/
+          result.stderr =~ /following gems matching|following version/
     end
 
     def handle_incompatible_semver

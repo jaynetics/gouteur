@@ -83,8 +83,9 @@ RSpec.describe Gouteur::Checker do
     it 'returns false if the current gem version is incompatible' do
       stub_repo_preparation!
       adapted_gemfile = "#{__dir__}/example_repo/Gemfile.gouteur"
-      File.open(adapted_gemfile, 'w') do |f|
-        f.puts "gem 'gouteur', '1337', path: '../../../'"
+      File.open(adapted_gemfile, 'w') do |file|
+        file.puts "source 'https://rubygems.org'"
+        file.puts "gem 'gouteur', '1337', path: '../../../'"
       end
       expect(checker.install_adapted_bundle).to eq false
     end

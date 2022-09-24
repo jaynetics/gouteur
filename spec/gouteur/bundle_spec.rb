@@ -22,7 +22,8 @@ RSpec.describe Gouteur::Bundle do
     result = bundle.exec('rake dummy')
     expect(result).to be_a(Gouteur::Shell::Result)
     expect(result.stdout).to match 'dummy output'
-    expect(result.stderr).to eq ''
+    stderr_without_deprecations = result.stderr.gsub(/.*deprecat.*\n?/i, '')
+    expect(stderr_without_deprecations).to eq ''
     expect(result).to be_success
 
     result = bundle.exec('my_imaginary_task')
