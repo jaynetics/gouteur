@@ -52,7 +52,7 @@ RSpec.describe Gouteur::Checker do
   let(:adapted_gemfile) { "#{__dir__}/example_repo/Gemfile.gouteur" }
 
   def write_adapted_gemfile(content)
-    File.write(adapted_gemfile, "source 'https://rubygems.org'\n\n#{content}"
+    File.write(adapted_gemfile, "source 'https://rubygems.org'\n\n#{content}")
   end
 
   describe '#create_adapted_gemfile' do
