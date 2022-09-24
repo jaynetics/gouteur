@@ -29,7 +29,7 @@ module Gouteur
       attr_reader :stdout, :stderr, :exitstatus
 
       def initialize(args:, pwd:, stdout:, stderr:, status:)
-        @args = args
+        @args = Array(args)
         @pwd = pwd
         @stdout = stdout
         @stderr = stderr

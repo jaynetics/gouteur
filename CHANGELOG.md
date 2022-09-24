@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Fixed
+
+- Fixed error message when a repo's `before` task fails
+
 ## [1.0.1] - 2021-03-09
 
 ### Fixed

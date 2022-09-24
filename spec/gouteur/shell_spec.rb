@@ -25,6 +25,8 @@ RSpec.describe Gouteur::Shell do
     it 'raises if not successful' do
       expect { Gouteur::Shell.run!(%w[my_imaginary_command]) }
         .to raise_error(Gouteur::Error, /my_imaginary_command/)
+      expect { Gouteur::Shell.run!('my_imaginary_command') }
+        .to raise_error(Gouteur::Error, /my_imaginary_command/)
     end
   end
 end
