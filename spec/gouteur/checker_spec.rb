@@ -49,10 +49,15 @@ RSpec.describe Gouteur::Checker do
     end
   end
 
+  let(:adapted_gemfile) { "#{__dir__}/example_repo/Gemfile.gouteur" }
+
+  def write_adapted_gemfile(content)
+    File.write(adapted_gemfile, "source 'https://rubygems.org'\n\n#{content}"
+  end
+
   describe '#create_adapted_gemfile' do
     it 'creates a gemfile referencing the local copy' do
       stub_repo_preparation!
-      adapted_gemfile = "#{__dir__}/example_repo/Gemfile.gouteur"
       `rm -f #{adapted_gemfile}` if File.exist?(adapted_gemfile)
 
       expect { checker.create_adapted_gemfile }
@@ -69,33 +74,28 @@ RSpec.describe Gouteur::Checker do
   describe '#install_adapted_bundle' do
     it 'installs the bundle from the adapted gemfile' do
       stub_repo_preparation!
-      adapted_gemfile = "#{__dir__}/example_repo/Gemfile.gouteur"
 
-      # this is very slow, but at the heart of the gem, so should be tested
-      File.open(adapted_gemfile, 'w') do |file|
-        file.puts "source 'https://rubygems.org'"
-        file.puts "gem 'sexy_slug'"
-      end
+      # this is very slow with a real gem download,
+      # but at the heart of the gem, so should be tested
+      write_adapted_gemfile("gem 'sexy_slug'")
+
       expect(checker.install_adapted_bundle).to eq true
       expect(File.read("#{adapted_gemfile}.lock")).to include 'sexy_slug'
     end
 
     it 'returns false if the current gem version is incompatible' do
       stub_repo_preparation!
-      adapted_gemfile = "#{__dir__}/example_repo/Gemfile.gouteur"
-      File.open(adapted_gemfile, 'w') do |file|
-        file.puts "source 'https://rubygems.org'"
-        file.puts "gem 'gouteur', '1337', path: '../../../'"
-      end
+
+      write_adapted_gemfile("gem 'gouteur', '1337', path: '../../../'")
+
       expect(checker.install_adapted_bundle).to eq false
     end
 
     it 'can raise if the installation fails for other reasons' do
       stub_repo_preparation!
-      adapted_gemfile = "#{__dir__}/example_repo/Gemfile.gouteur"
-      File.open(adapted_gemfile, 'w') do |f|
-        f.puts 'nonsense'
-      end
+
+      write_adapted_gemfile('nonsense')
+
       expect { checker.install_adapted_bundle }.to raise_error(Gouteur::Error)
     end
   end
@@ -157,8 +157,7 @@ RSpec.describe Gouteur::Checker do
 
       expect { checker.run_task('rspec') }.not_to raise_error
 
-      adapted_gemfile = "#{__dir__}/example_repo/Gemfile.gouteur"
-      File.open(adapted_gemfile, 'w') { |f| f.puts "gem 'i_dont_exist'" }
+      write_adapted_gemfile("gem 'i_dont_exist'")
 
       expect { checker.run_task('rspec', adapted: true) }
         .to raise_error(Gouteur::Error, /i_dont_exist/)
