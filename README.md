@@ -37,7 +37,9 @@ repos:
     ref: some_specific_branch # optional, default is the default branch
     before: setup_special_dependency # optional, bundle is always installed
     tasks: ['rspec', 'rake foo'] # optional, default is `rake`
+    name: cool_gem # optional, defaults to repo name from uri, e.g. `some_gem`
     locked: true # optional, prevents setting an incompatible VERSION
+    force: true # optional, forces test even if VERSION is incompatible
 ```
 
 Then simply `bundle exec gouteur` or add the rake task to your Rakefile:
@@ -64,7 +66,11 @@ tasks: 'rspec --pattern "**/{,*}{keyword1,keyword2}{,*,*/**/*}_spec.rb"'`
 From the shell:
 
 ```shell
+# example: check one dependent repo
 gouteur 'https://github.com/foo/bar'
+
+# see other usage options:
+gouteur --help
 ```
 
 From Ruby:
@@ -86,7 +92,6 @@ Possible future improvements:
 - support more sources of code, e.g. latest release, private GitHub repositories
 - improve performance by tracing & rerunning only specs/tests that use the gem
 - save time in MiniTest by forcing it to run in fail-fast mode like RSpec
-- add help output and more options to the CLI executable
 - other ideas? open an issue!
 
 ## License

@@ -55,22 +55,6 @@ RSpec.describe Gouteur::Checker do
     File.write(adapted_gemfile, "source 'https://rubygems.org'\n\n#{content}")
   end
 
-  describe '#create_adapted_gemfile' do
-    it 'creates a gemfile referencing the local copy' do
-      stub_repo_preparation!
-      `rm -f #{adapted_gemfile}` if File.exist?(adapted_gemfile)
-
-      expect { checker.create_adapted_gemfile }
-        .to change { File.exist?(adapted_gemfile) }.to(true)
-
-      content = File.read(adapted_gemfile)
-      expect(content).to match %r{^gem 'gouteur', path: '/.+ # set by gouteur}
-
-      # there should be only on mention
-      expect(content.scan(/^gem *["']gouteur["']/).count).to eq 1
-    end
-  end
-
   describe '#install_adapted_bundle' do
     it 'installs the bundle from the adapted gemfile' do
       stub_repo_preparation!
@@ -97,33 +81,6 @@ RSpec.describe Gouteur::Checker do
       write_adapted_gemfile('nonsense')
 
       expect { checker.install_adapted_bundle }.to raise_error(Gouteur::Error)
-    end
-  end
-
-  describe '#adapt_gemfile_content' do
-    it 'surely works without a parser for every case there is in the world' do
-      adapt = ->(content) { checker.adapt_gemfile_content(content) }
-
-      expect(adapt[%()])
-        .to match %r{^gem 'gouteur', path: '/.+ # set by gouteur}
-
-      expect(adapt[%(gem 'other')])
-        .to match %r{gem 'other'\ngem 'gouteur', path: '/.+ # set by gouteur}
-
-      expect(adapt[%(gem 'gouteur')])
-        .to match %r{^gem 'gouteur', path: '/.+ # set by gouteur}
-
-      expect(adapt[%(gem 'gouteur' # cool!)])
-        .to match %r{^gem 'gouteur', path: '/.+ # set by gouteur}
-
-      expect(adapt[%(gem 'gouteur', '1.2-pre')])
-        .to match %r{^gem 'gouteur', '1\.2-pre', path: '/.+ # set by gouteur}
-
-      expect(adapt[%(gem 'gouteur', '1.2' # cool!)])
-        .to match %r{^gem 'gouteur', '1\.2', path: '/.+ # set by gouteur}
-
-      expect(adapt[%(gem "gouteur",\n"1.2")])
-        .to match %r{^gem 'gouteur',\n"1\.2", path: '/.+ # set by gouteur}
     end
   end
 

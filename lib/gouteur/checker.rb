@@ -3,15 +3,16 @@ require 'yaml'
 module Gouteur
   # main process class
   class Checker
-    attr_reader :repo
+    attr_reader :repo, :force
 
-    def self.call(repo, silent: false)
-      new(repo, silent: silent).call
+    def self.call(repo, silent: false, force: repo&.force?)
+      new(repo, silent: silent, force: force).call
     end
 
-    def initialize(repo, silent: false)
+    def initialize(repo, silent: false, force: repo&.force?)
       @repo = repo
       @silent = silent
+      @force = force
     end
 
     def call
@@ -21,7 +22,8 @@ module Gouteur
 
       run_tasks(adapted: false)
 
-      create_adapted_gemfile
+      repo.gemfile.create_adapted(drop_version_constraint: force)
+      repo.remove_host_from_gemspecs if force
       install_adapted_bundle or return handle_incompatible_semver
 
       run_tasks(adapted: true)
@@ -58,36 +60,6 @@ module Gouteur
       )
     end
 
-    def create_adapted_gemfile
-      content = File.exist?(gemfile_path) ? File.read(gemfile_path) : ''
-      adapted_content = adapt_gemfile_content(content)
-      File.open(adapted_gemfile_path, 'w') { |f| f.puts(adapted_content) }
-    end
-
-    def adapt_gemfile_content(content)
-      new_entry = "gem '#{Host.name}', path: '#{Host.root}' # set by gouteur "
-
-      existing_ref_pattern =
-        /^ *gem +(?<q>'|")#{Host.name}\k<q>(?<v> *,\s*(?<q2>'|")[^'"]+\k<q2>*)?/
-
-      if content =~ existing_ref_pattern
-        content.gsub(existing_ref_pattern) do
-          # keep version specification if there was one
-          new_entry.sub(/(?=, path:)/, Regexp.last_match[:v].to_s)
-        end
-      else
-        "#{content}\n#{new_entry}\n"
-      end
-    end
-
-    def gemfile_path
-      repo.bundle.gemfile_path
-    end
-
-    def adapted_gemfile_path
-      "#{repo.bundle.gemfile_path}.gouteur"
-    end
-
     def install_adapted_bundle
       result = repo.bundle.install(env: adaptation_env)
       if result.success?
@@ -116,7 +88,7 @@ module Gouteur
 
     def adaptation_env
       {
-        'BUNDLE_GEMFILE' => adapted_gemfile_path,
+        'BUNDLE_GEMFILE' => repo.gemfile.adapted_path,
         'SPEC_OPTS' => '--fail-fast', # saves time with rspec tasks
       }
     end

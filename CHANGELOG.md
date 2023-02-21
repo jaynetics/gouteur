@@ -1,5 +1,14 @@
 ## [Unreleased]
 
+## [1.1.0] - 2023-02-21
+
+### Added
+
+- Added force flag to force testing, irrespective of version constraints
+- Support passing dotfile repo names to CLI
+- Support setting custom names for repos in dotfile
+- Support git SSH/SCP addresses
+
 ## [1.0.2] - 2022-09-24
 
 ### Fixed

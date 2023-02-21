@@ -4,7 +4,7 @@ RSpec.describe Gouteur::Dotfile do
       result = Gouteur::Dotfile.repos
       expect(result.count).to eq 1
       expect(result.first).to be_a Gouteur::Repo
-      expect(result.first.uri.to_s).to eq 'example_uri_in_dotfile'
+      expect(result.first.uri).to eq 'example_uri_in_dotfile'
     end
   end
 end

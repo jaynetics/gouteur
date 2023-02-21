@@ -5,6 +5,6 @@ RSpec.describe 'With bundled gouteur' do
 
   it 'uses the correct dotfile' do
     expect(Gouteur::Dotfile.repos.count).to eq 1
-    expect(Gouteur::Dotfile.repos.first.uri.to_s).to eq 'uri_in_nested_dotfile'
+    expect(Gouteur::Dotfile.repos.first.uri).to eq 'uri_in_nested_dotfile'
   end
 end

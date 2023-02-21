@@ -75,6 +75,8 @@ module Gouteur
         The new version number of `#{Host.name}` is incompatible with the version requirements specified by `#{repo}`.
 
         Releasing incompatible versions is considered OK by default, so tasks will be SKIPPED in this case. If you want gouteur to FAIL in this case, set the `locked` flag.
+
+        Use the `force` flag to override this version constraint and run the tests anyway.
       MSG
     end
 
@@ -84,7 +86,7 @@ module Gouteur
 
         The new version number of `#{Host.name}` is incompatible with the version requirements specified by `#{repo}`.
 
-        Incompatible version numbers can be allowed by removing the `locked` flag. This will make gouteur SKIP the tasks in this case.
+        Incompatible version numbers can be allowed by removing the `locked` flag. This will make gouteur SKIP the tasks in this case unless the `force` flag is set.
       MSG
     end
 

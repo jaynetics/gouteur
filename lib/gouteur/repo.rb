@@ -6,13 +6,22 @@ module Gouteur
     attr_reader :uri, :name, :ref, :tasks
     alias to_s name
 
-    def initialize(uri:, ref: nil, before: [], tasks: 'rake', locked: false)
-      @uri    = URI.parse(uri)
-      @name   = extract_name_from_uri(uri)
+    def initialize(
+      uri:,
+      name:   nil,
+      ref:    nil,
+      before: [],
+      tasks:  'rake',
+      locked: false,
+      force:  false
+    )
+      @uri    = uri
+      @name   = name || extract_name_from_uri(uri)
       @ref    = ref
       @before = Array(before)
       @tasks  = Array(tasks)
       @locked = !!locked
+      @force  = !!force
     end
 
     def fetch
@@ -35,8 +44,24 @@ module Gouteur
       @bundle ||= Gouteur::Bundle.new(clone_path)
     end
 
+    def gemfile
+      @gemfile ||= Gouteur::Gemfile.new(bundle.gemfile_path)
+    end
+
     def locked?
       @locked
+    end
+
+    def force?
+      @force
+    end
+
+    def remove_host_from_gemspecs
+      Dir[File.join(clone_path, '*.gemspec')].each do |gemspec_path|
+        content = File.read(gemspec_path)
+        new_content = content.gsub(/^.+_dependency.+\b#{Host.name}\b.+$/, '')
+        File.write(gemspec_path, new_content)
+      end
     end
 
     private

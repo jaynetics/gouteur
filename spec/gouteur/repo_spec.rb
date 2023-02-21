@@ -2,10 +2,12 @@ RSpec.describe Gouteur::Repo do
   let(:repo) { Gouteur::Repo.new(uri: "#{__dir__}/example_repo") }
 
   it 'has a #uri' do
-    expect(repo.uri).to be_a URI
+    # String, not URI, because git SSH addresses are not valid URLs,
+    # c.f. https://stackoverflow.com/a/70330178
+    expect(repo.uri).to be_a String
   end
 
-  it 'extracts a #name from the uri' do
+  it 'extracts a #name from the uri, or can have a custom name' do
     expect(repo.name).to eq 'example_repo'
 
     github_repo = Gouteur::Repo.new(uri: 'https://github.com/user/project')
@@ -16,6 +18,9 @@ RSpec.describe Gouteur::Repo do
 
     non_github_repo = Gouteur::Repo.new(uri: 'https://foo.com/bar?baz=123')
     expect(non_github_repo.name).to eq 'bar'
+
+    named_repo = Gouteur::Repo.new(name: 'cool', uri: 'https://x.y/z')
+    expect(named_repo.name).to eq 'cool'
 
     expect { Gouteur::Repo.new(uri: '') }.to raise_error(Gouteur::Error, /name/)
   end
@@ -47,7 +52,7 @@ RSpec.describe Gouteur::Repo do
 
   it 'can #fetch and #remove the repo' do
     # sub-repo is not checked in with main repo, make sure it exists
-    Dir.chdir(repo.uri.to_s) do
+    Dir.chdir(repo.uri) do
       File.exist?("#{repo.uri}/.git") || `git init`
       `git add . && git commit -am 🚀`
     end
