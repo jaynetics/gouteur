@@ -26,3 +26,5 @@ jobs:
       - name: Run the specs
         run: |
           bundle exec rspec
+      - uses: codecov/codecov-action@v3
+        if: matrix.ruby == '3.0'

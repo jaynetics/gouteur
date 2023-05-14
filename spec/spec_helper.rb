@@ -1,3 +1,10 @@
+if RUBY_VERSION.start_with?('3.0')
+  require 'simplecov'
+  require 'simplecov-cobertura'
+  SimpleCov.formatter = SimpleCov::Formatter::CoberturaFormatter
+  SimpleCov.start
+end
+
 require 'gouteur'
 require 'debug'
 
