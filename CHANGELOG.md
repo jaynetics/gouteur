@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [1.2.0] - 2026-04-04
+
 ### Added
 
 - Support for repos where the bundle is in a subdirectory
