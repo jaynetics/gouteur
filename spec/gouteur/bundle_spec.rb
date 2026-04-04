@@ -21,6 +21,7 @@ RSpec.describe Gouteur::Bundle do
   it 'can #exec' do
     result = bundle.exec('rake dummy')
     expect(result).to be_a(Gouteur::Shell::Result)
+    expect(result).to be_success, "exec error: #{result.full_error}"
     expect(result.stdout).to match 'dummy output'
     stderr_without_deprecations = result.stderr.gsub(/.*deprecat.*\n?/i, '')
     expect(stderr_without_deprecations).to eq ''

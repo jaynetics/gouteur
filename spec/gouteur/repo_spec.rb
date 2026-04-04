@@ -50,6 +50,21 @@ RSpec.describe Gouteur::Repo do
     expect(repo.clone_path).to match %r{gouteur_repos/example_repo$}
   end
 
+  it 'has a #bundle_path equal to #clone_path by default' do
+    expect(repo.bundle_path).to eq repo.clone_path
+  end
+
+  it 'can have a #subdir that shifts #bundle_path' do
+    repo = Gouteur::Repo.new(uri: './repo', subdir: 'ruby')
+    expect(repo.subdir).to eq 'ruby'
+    expect(repo.bundle_path).to eq File.join(repo.clone_path, 'ruby')
+  end
+
+  it 'creates a #bundle at #bundle_path' do
+    repo = Gouteur::Repo.new(uri: './repo', subdir: 'ruby')
+    expect(repo.bundle.path).to eq repo.bundle_path
+  end
+
   it 'can #fetch and #remove the repo' do
     # sub-repo is not checked in with main repo, make sure it exists
     Dir.chdir(repo.uri) do
@@ -62,5 +77,15 @@ RSpec.describe Gouteur::Repo do
     expect { repo.fetch }.to change { File.exist?(cloned_gemfile) }.to(true)
     expect { repo.fetch }.not_to change { File.exist?(cloned_gemfile) }
     expect { repo.remove }.to change { File.exist?(cloned_gemfile) }.to(false)
+  end
+
+  it 'validates subdir existence after #fetch' do
+    repo_with_subdir = Gouteur::Repo.new(
+      uri: "#{__dir__}/example_repo",
+      subdir: 'nonexistent'
+    )
+    expect { repo_with_subdir.fetch }
+      .to raise_error(Gouteur::Error, /subdirectory `nonexistent` not found/)
+    repo_with_subdir.remove
   end
 end

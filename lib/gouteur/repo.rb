@@ -3,7 +3,7 @@ require 'uri'
 module Gouteur
   # a repository of code that depends on the library under test
   class Repo
-    attr_reader :uri, :name, :ref, :tasks
+    attr_reader :uri, :name, :ref, :tasks, :subdir
     alias to_s name
 
     def initialize(
@@ -13,7 +13,8 @@ module Gouteur
       before: [],
       tasks:  'rake',
       locked: false,
-      force:  false
+      force:  false,
+      subdir: nil
     )
       @uri    = uri
       @name   = name || extract_name_from_uri(uri)
@@ -22,10 +23,12 @@ module Gouteur
       @tasks  = Array(tasks)
       @locked = !!locked
       @force  = !!force
+      @subdir = subdir
     end
 
     def fetch
       cloned? ? pull : clone
+      validate_subdir if subdir
     end
 
     def prepare
@@ -40,8 +43,12 @@ module Gouteur
       File.join(store_dir, name)
     end
 
+    def bundle_path
+      subdir ? File.join(clone_path, subdir) : clone_path
+    end
+
     def bundle
-      @bundle ||= Gouteur::Bundle.new(clone_path)
+      @bundle ||= Gouteur::Bundle.new(bundle_path)
     end
 
     def gemfile
@@ -57,7 +64,7 @@ module Gouteur
     end
 
     def remove_host_from_gemspecs
-      Dir[File.join(clone_path, '*.gemspec')].each do |gemspec_path|
+      Dir[File.join(bundle_path, '*.gemspec')].each do |gemspec_path|
         content = File.read(gemspec_path)
         new_content = content.gsub(/^.+_dependency.+\b#{Host.name}\b.+$/, '')
         File.write(gemspec_path, new_content)
@@ -65,6 +72,11 @@ module Gouteur
     end
 
     private
+
+    def validate_subdir
+      File.directory?(bundle_path) ||
+        raise(Error, "subdirectory `#{subdir}` not found in `#{name}`")
+    end
 
     def extract_name_from_uri(uri)
       uri[%r{git(?:hub|lab)\.com/[^/]+/([^/]+)}, 1] ||

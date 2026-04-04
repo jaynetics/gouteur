@@ -30,17 +30,12 @@ Add `gouteur` to the development dependencies of your gem.
 
 ### Recommended usage
 
-Create a `.gouteur.yml` in the root of your project:
+Create a `.gouteur.yml` in the root of your project and add the gems you want to test against:
 
 ```yml
 repos:
   - uri: https://github.com/someone/some_gem
-    ref: some_specific_branch # optional, default is the default branch
-    before: setup_special_dependency # optional, bundle is always installed
-    tasks: ['rspec', 'rake foo'] # optional, default is `rake`
-    name: cool_gem # optional, defaults to repo name from uri, e.g. `some_gem`
-    locked: true # optional, prevents setting an incompatible VERSION
-    force: true # optional, forces test even if VERSION is incompatible
+  - uri: https://github.com/someone/another_gem
 ```
 
 Then simply `bundle exec gouteur` or add the rake task to your Rakefile:
@@ -53,13 +48,30 @@ Gouteur::RakeTask.new
 task default: %i[rspec gouteur]
 ```
 
-Pro tip: for large repos, running only relevant specs can speed up things a lot, e.g.:
+Pro tip: gouteur executes the default rake task of each gem by default, but for large repos, running only relevant specs can speed up things a lot, e.g.:
 
 ```yml
-tasks: 'rspec spec/known_relevant_spec.rb'
+repos:
+  - uri: some_gem_uri
+    tasks: 'rspec spec/known_relevant_spec.rb'
+  - uri: some_other_uri
+    tasks: 'rspec --pattern "**/{,*}{keyword1,keyword2}{,*,*/**/*}_spec.rb"'`
 ```
+
+### Other configuration options
+
+There are many other configuration options. All except the `uri` are optional.
+
 ```yml
-tasks: 'rspec --pattern "**/{,*}{keyword1,keyword2}{,*,*/**/*}_spec.rb"'`
+repos:
+  - uri: https://github.com/someone/some_gem
+    ref: some_specific_branch # default is the default branch
+    subdir: the_actual_gem # if gem is in a subdir of the repo
+    before: setup_special_dependency # bundle is always installed
+    tasks: ['rspec', 'rake foo'] # default is `rake`
+    name: cool_gem # defaults to repo name from uri, e.g. `some_gem`
+    locked: true # prevents setting an incompatible VERSION
+    force: true # forces test even if VERSION is incompatible
 ```
 
 ### Manual usage
@@ -89,6 +101,7 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/jaynet
 
 Possible future improvements:
 
+- verbose mode
 - consider caching of dependent repositories in CI, e.g. in GitHub workflows
 - support more sources of code, e.g. latest release, private GitHub repositories
 - improve performance by tracing & rerunning only specs/tests that use the gem

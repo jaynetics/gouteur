@@ -8,10 +8,10 @@ jobs:
 
     strategy:
       matrix:
-        ruby: [ '2.6', '3.0', 'ruby-head' ]
+        ruby: [ '3.0', '4.0' ]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up Ruby ${{ matrix.ruby }}
         uses: ruby/setup-ruby@v1
         with:
@@ -22,10 +22,10 @@ jobs:
           git config --global user.email "testuser@example.com"
           git config --global user.name "Test User"
           gem update --system
-          gem install bundler -v 2.4.13
+          gem install bundler -v 4.0.9
           bundle install --jobs 4
       - name: Run the specs
         run: |
           bundle exec rspec
       - uses: codecov/codecov-action@v3
-        if: matrix.ruby == '3.0'
+        if: matrix.ruby == '4.0'

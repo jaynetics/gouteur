@@ -16,7 +16,7 @@ module Gouteur
     end
 
     def exec(task, env: {})
-      name = task.sub(/bundle exec +/, '')
+      name = task.sub(/bundle +exec +/, '')
       Shell.run(%W[bundle exec #{name}], pwd: path, env: env)
     end
 
