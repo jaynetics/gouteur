@@ -24,8 +24,8 @@ jobs:
           gem update --system
           gem install bundler -v 4.0.9
           bundle install --jobs 4
-      - name: Run the specs
+      - name: Build
         run: |
-          bundle exec rspec
+          bundle exec rake
       - uses: codecov/codecov-action@v3
         if: matrix.ruby == '4.0'
