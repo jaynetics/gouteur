@@ -28,16 +28,16 @@ RSpec.describe Gouteur::CLI do
       end.to output(/no repo/).to_stdout
     end
 
-    it 'passes the force flag to the checker' do
+    it 'passes the force and quick flags to the checker' do
       expect(Gouteur::CLI).to receive(:pick_repos).and_return([repo])
-      expect(Gouteur::Checker).to receive(:call).with(repo, force: true)
-      expect { expect(Gouteur::CLI.call(['foo', '-f'])) }.to output.to_stdout
+      expect(Gouteur::Checker).to receive(:call).with(repo, force: true, quick: true)
+      expect { expect(Gouteur::CLI.call(['foo', '-f', '-q'])) }.to output.to_stdout
     end
 
-    it 'passes the repo force setting to the checker' do
-      expect(repo).to receive(:force?).and_return(true)
+    it 'passes the Null for force and quick if not given' do
       expect(Gouteur::CLI).to receive(:pick_repos).and_return([repo])
-      expect(Gouteur::Checker).to receive(:call).with(repo, force: true)
+      expect(Gouteur::Checker).to receive(:call)
+        .with(repo, force: Gouteur::Null, quick: Gouteur::Null)
       expect { expect(Gouteur::CLI.call(['foo'])) }.to output.to_stdout
     end
   end

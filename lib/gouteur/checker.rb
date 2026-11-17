@@ -3,16 +3,17 @@ require 'yaml'
 module Gouteur
   # main process class
   class Checker
-    attr_reader :repo, :force
+    attr_reader :repo, :force, :quick
 
-    def self.call(repo, silent: false, force: repo&.force?)
-      new(repo, silent: silent, force: force).call
+    def self.call(repo, silent: false, force: Null, quick: Null)
+      new(repo, silent: silent, force: force, quick: quick).call
     end
 
-    def initialize(repo, silent: false, force: repo&.force?)
+    def initialize(repo, silent: false, force: Null, quick: Null)
       @repo = repo
       @silent = silent
-      @force = force
+      @force = force.equal?(Null) ? repo&.force? : force
+      @quick = quick.equal?(Null) ? repo&.quick? : quick
     end
 
     def call
@@ -20,13 +21,9 @@ module Gouteur
       prepare
       check_dependence
 
-      run_tasks(adapted: false)
+      pre_check_with_old_dependency_code
 
-      repo.gemfile.create_adapted(drop_version_constraint: force)
-      repo.remove_host_from_gemspecs if force
-      install_adapted_bundle or return handle_incompatible_semver
-
-      run_tasks(adapted: true)
+      inject_and_check_with_new_dependency_code
 
       [true, Message.success(repo: repo)]
     rescue Gouteur::Error => e
@@ -43,6 +40,18 @@ module Gouteur
     def check_dependence
       repo.bundle.depends_on?(Host.name) ||
         raise(Error, Message.no_dependence(repo: repo))
+    end
+
+    def pre_check_with_old_dependency_code
+      run_tasks(adapted: false) unless quick
+    end
+
+    def inject_and_check_with_new_dependency_code
+      repo.gemfile.create_adapted(drop_version_constraint: force)
+      repo.remove_host_from_gemspecs if force
+      install_adapted_bundle or return handle_incompatible_semver
+
+      run_tasks(adapted: true)
     end
 
     def run_tasks(adapted: false)

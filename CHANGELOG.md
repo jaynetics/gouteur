@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Added
+
+- `quick` flag to skip pre-test with old dependency code
+
 ### Fixed
 
 - respect `force` flag in yml config

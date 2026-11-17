@@ -14,7 +14,8 @@ module Gouteur
       tasks:  'rake',
       locked: false,
       force:  false,
-      subdir: nil
+      subdir: nil,
+      quick:  false
     )
       @uri    = uri
       @name   = name || extract_name_from_uri(uri)
@@ -24,6 +25,7 @@ module Gouteur
       @locked = !!locked
       @force  = !!force
       @subdir = subdir
+      @quick  = !!quick
     end
 
     def fetch
@@ -61,6 +63,10 @@ module Gouteur
 
     def force?
       @force
+    end
+
+    def quick?
+      @quick
     end
 
     def remove_host_from_gemspecs

@@ -67,11 +67,12 @@ repos:
   - uri: https://github.com/someone/some_gem
     ref: some_specific_branch # default is the default branch
     subdir: the_actual_gem # if gem is in a subdir of the repo
-    before: setup_special_dependency # bundle is always installed
+    before: set_up_special_dependency # bundle is always installed
     tasks: ['rspec', 'rake foo'] # default is `rake`
     name: cool_gem # defaults to repo name from uri, e.g. `some_gem`
     locked: true # prevents setting an incompatible VERSION
     force: true # forces test even if VERSION is incompatible
+    quick: true # test only against changes, not the original code
 ```
 
 ### Manual usage

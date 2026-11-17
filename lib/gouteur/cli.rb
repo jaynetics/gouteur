@@ -15,15 +15,15 @@ module Gouteur
       end
 
       repos.all? do |repo|
-        force = @force || repo.force?
-        success, message = Gouteur::Checker.call(repo, force: force)
+        success, message = Checker.call(repo, force: @force, quick: @quick)
         puts '', message, ''
         success
       end
     end
 
     def option_parser
-      @force = false
+      @force = Null
+      @quick = Null
 
       OptionParser.new do |opts|
         opts.banner = <<~SH
@@ -39,6 +39,10 @@ module Gouteur
 
         opts.on("-f", "--force", "Force tests, override version constraints") do
           @force = true
+        end
+
+        opts.on("-q", "--quick", "Test only changes, skip pre-test with original code") do
+          @quick = true
         end
 
         opts.on("-v", "--version", "Show gouteur version") do
@@ -61,7 +65,7 @@ module Gouteur
         if dotfile_repo = dotfile_repos.find { |r| r.name == arg }
           dotfile_repo
         else
-          Gouteur::Repo.new(uri: arg)
+          Repo.new(uri: arg)
         end
       end
     end

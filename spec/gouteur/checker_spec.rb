@@ -36,6 +36,42 @@ RSpec.describe Gouteur::Checker do
     end
   end
 
+  describe '#pre_check_with_old_dependency_code' do
+    it 'skips the check if set to quick via kwarg' do
+      checker = Gouteur::Checker.new(repo, quick: true)
+      expect(checker).not_to receive(:run_tasks)
+      checker.pre_check_with_old_dependency_code
+    end
+
+    it 'skips the check if set to quick via the repo' do
+      expect(repo).to receive(:quick?).and_return(true)
+      checker = Gouteur::Checker.new(repo)
+      expect(checker).not_to receive(:run_tasks)
+      checker.pre_check_with_old_dependency_code
+    end
+  end
+
+  describe '#inject_and_check_with_new_dependency_code' do
+    it 'removes the host from the gemspec if set to force via kwarg' do
+      checker = Gouteur::Checker.new(repo, force: true)
+      allow(checker).to receive(:install_adapted_bundle)
+      allow(checker).to receive(:run_tasks)
+      allow(repo.gemfile).to receive(:create_adapted)
+      expect(repo).to receive(:remove_host_from_gemspecs)
+      checker.inject_and_check_with_new_dependency_code
+    end
+
+    it 'removes the host from the gemspec if set to force via the repo' do
+      expect(repo).to receive(:force?).and_return(true)
+      checker = Gouteur::Checker.new(repo)
+      allow(checker).to receive(:install_adapted_bundle)
+      allow(checker).to receive(:run_tasks)
+      allow(repo.gemfile).to receive(:create_adapted)
+      expect(repo).to receive(:remove_host_from_gemspecs)
+      checker.inject_and_check_with_new_dependency_code
+    end
+  end
+
   describe '#run_tasks' do
     it 'fails if there are no tasks' do
       expect(repo).to receive(:tasks).and_return([])
