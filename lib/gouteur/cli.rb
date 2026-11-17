@@ -15,7 +15,8 @@ module Gouteur
       end
 
       repos.all? do |repo|
-        success, message = Gouteur::Checker.call(repo, force: !!@force)
+        force = @force || repo.force?
+        success, message = Gouteur::Checker.call(repo, force: force)
         puts '', message, ''
         success
       end

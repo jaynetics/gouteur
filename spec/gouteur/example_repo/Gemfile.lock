@@ -1,7 +1,7 @@
 PATH
   remote: ../../..
   specs:
-    gouteur (1.1.0)
+    gouteur (1.2.1)
 
 PATH
   remote: .

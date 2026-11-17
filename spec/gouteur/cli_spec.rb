@@ -33,6 +33,13 @@ RSpec.describe Gouteur::CLI do
       expect(Gouteur::Checker).to receive(:call).with(repo, force: true)
       expect { expect(Gouteur::CLI.call(['foo', '-f'])) }.to output.to_stdout
     end
+
+    it 'passes the repo force setting to the checker' do
+      expect(repo).to receive(:force?).and_return(true)
+      expect(Gouteur::CLI).to receive(:pick_repos).and_return([repo])
+      expect(Gouteur::Checker).to receive(:call).with(repo, force: true)
+      expect { expect(Gouteur::CLI.call(['foo'])) }.to output.to_stdout
+    end
   end
 
   describe '::pick_repos' do

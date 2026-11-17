@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Fixed
+
+- respect `force` flag in yml config
+
 ## [1.2.0] - 2026-04-04
 
 ### Added
